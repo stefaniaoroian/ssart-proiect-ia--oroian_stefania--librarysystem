@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notifications</title>
+</head>
+<body>
+
+<h2>Notifications</h2>
+
+<ul>
+    <li th:each="n : ${notifications}">
+        <b th:text="${n.message}"></b><br>
+        <small th:text="${n.createdAt}"></small>
+    </li>
+</ul>
+
+</body>
+</html>

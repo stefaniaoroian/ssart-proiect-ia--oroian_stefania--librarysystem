@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Digital Library</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        th {
+            background: #f4f4f4;
+        }
+        .qr {
+            width: 100px;
+        }
+        .status-available {
+            color: green;
+            font-weight: bold;
+        }
+        .status-reserved {
+            color: orange;
+            font-weight: bold;
+        }
+        .nav {
+            margin-bottom: 20px;
+        }
+        .nav button {
+            padding: 8px 12px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <a href="/librarian/dashboard">
+        <button>Librarian Dashboard</button>
+    </a>
+</div>
+
+<h1>Digital Library</h1>
+
+<table>
+    <tr>
+        <th>QR</th>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Status</th>
+        <th>Checkout</th>
+    </tr>
+
+    <tr th:each="book : ${books}">
+        <td>
+            <img class="qr"
+                 th:src="'data:image/png;base64,' + ${book.qrCode}"
+                 alt="QR"/>
+        </td>
+
+        <td th:text="${book.title}"></td>
+        <td th:text="${book.author}"></td>
+
+        <td>
+            <span th:if="${book.availableCopies > 0}" class="status-available">
+                 Available
+            </span>
+            <span th:if="${book.availableCopies == 0}" class="status-reserved">
+                 Reserved
+            </span>
+        </td>
+
+        <td>
+            <a th:href="'/student/checkout?bookId=' + ${book.id}">
+                <button>Checkout</button>
+            </a>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

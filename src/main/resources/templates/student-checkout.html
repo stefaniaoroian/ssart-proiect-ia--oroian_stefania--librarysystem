@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Student Checkout</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .history { margin-top: 30px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: #f4f4f4; }
+        .overdue { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h2 th:text="'Book: ' + ${book.title}"></h2>
+<p th:text="'Author: ' + ${book.author}"></p>
+
+<hr>
+
+<form action="/student/checkout" method="get">
+    <input type="hidden" name="bookId" th:value="${book.id}"/>
+
+    <label>Select User:</label>
+    <select name="userId" required>
+        <option value="">-- choose --</option>
+        <option th:each="u : ${users}"
+                th:value="${u.id}"
+                th:text="${u.name} + ' (' + ${u.role} + ')'"
+                th:selected="${selectedUser == u.id}">
+        </option>
+    </select>
+
+    <button type="submit">Load User</button>
+</form>
+
+<hr>
+
+<p th:if="${myPosition}">
+    Your position in queue: <b th:text="${myPosition}"></b>
+</p>
+
+<div th:if="${hasBook == true}">
+    <h3>You currently have this book</h3>
+
+    <form action="/checkout/return" method="post">
+        <input type="hidden" name="bookId" th:value="${book.id}"/>
+        <input type="hidden" name="userId" th:value="${selectedUser}"/>
+
+        <button type="submit">Return Book</button>
+    </form>
+</div>
+
+
+
+<div th:if="${hasBook == false}">
+    <h3>Checkout / Reserve</h3>
+
+    <form action="/checkout" method="post">
+        <input type="hidden" name="bookId" th:value="${book.id}"/>
+        <input type="hidden" name="userId" th:value="${selectedUser}"/>
+
+        <button type="submit">Checkout / Join Waitlist</button>
+    </form>
+</div>
+
+
+<div class="history" th:if="${history}">
+    <h3>Your Checkout History</h3>
+    <table>
+        <tr>
+            <th>Book</th>
+            <th>Checkout Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Late Fee</th>
+        </tr>
+
+        <tr th:each="loan : ${history}">
+            <td th:text="${loan.book.title}"></td>
+            <td th:text="${loan.checkoutDate}"></td>
+            <td th:text="${loan.dueDate}"></td>
+            <td>
+                <span th:if="${loan.returnDate == null}">Active</span>
+                <span th:if="${loan.returnDate != null}">Returned</span>
+            </td>
+            <td>
+                <span th:if="${loan.returnDate != null and loan.lateFee > 0}"><b th:text="${loan.lateFee}"></b> RON
+                </span>
+                <span th:if="${loan.returnDate != null and loan.lateFee == 0}">
+                    -
+                </span>
+                <span th:if="${loan.returnDate == null and loan.dueDate.isBefore(T(java.time.LocalDate).now())}">
+            ️      <b th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(loan.dueDate, T(java.time.LocalDate).now()) * 2}"></b> RON (if returned today)
+                </span>
+                <span th:if="${loan.returnDate == null and !loan.dueDate.isBefore(T(java.time.LocalDate).now())}">
+                    —
+                </span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>
